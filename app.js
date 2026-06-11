@@ -113,31 +113,62 @@ function renderActivePreview() {
 // 4. FUNGSI AI GENERATE (MOCK / SIMULASI)
 // ==========================================
 async function generateAI(section) {
-    const btn = event.target.closest('button');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Berpikir...';
-    btn.disabled = true;
+  const btn = event.target.closest('button');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI Berpikir...';
+  btn.disabled = true;
 
-    // Simulasi delay AI (Nanti bisa diganti fetch ke API Vercel)
-    setTimeout(() => {
-        if (section === 'kbc') {
-            document.getElementById('f-pancacinta').value = "Cinta Allah & Rasul";
-            document.getElementById('f-kbc-insersi').value = "Menanamkan nilai keimanan bahwa materi ini adalah bentuk kasih sayang Allah kepada hamba-Nya.";
-            document.getElementById('f-kbc-kontekstual').value = `Memaknai ${document.getElementById('f-materi-pokok').value || 'Materi'} sebagai Surat Cinta dari Allah untuk Keseimbangan Hidup.`;
-        } else if (section === 'cp_tp') {
-            document.getElementById('f-cp').value = `Peserta didik mampu memahami, menganalisis, dan mempraktikkan konsep ${document.getElementById('f-materi-pokok').value || 'materi'} dengan landasan iman dan taqwa.`;
-            document.getElementById('f-tp1').value = `Peserta didik mampu menjelaskan konsep dasar ${document.getElementById('f-materi-pokok').value || 'materi'} dengan benar.`;
-            document.getElementById('f-tp2').value = `Peserta didik mampu menganalisis hikmah dan relevansi ${document.getElementById('f-materi-pokok').value || 'materi'} dalam kehidupan sehari-hari.`;
-        } else if (section === 'kbm') {
-            document.getElementById('f-kbm-pendahuluan').value = "Guru membuka kelas dengan salam hangat, doa bersama, dan menanyakan kabar hati siswa (Koneksi Hati). Apersepsi dilakukan dengan pertanyaan pemantik yang menyentuh emosi.";
-            document.getElementById('f-kbm-inti').value = "1. Mindful: Siswa hening sejenak merenungkan keagungan materi.\n2. Meaningful: Guru menjelaskan konsep dikaitkan dengan kehidupan nyata.\n3. Joyful & Diferensiasi: Siswa bekerja dalam kelompok sesuai minat (Visual membuat peta konsep, Auditori berdiskusi, Kinestetik membuat karya).";
-            document.getElementById('f-kbm-penutup').value = "Siswa melakukan refleksi rasa (apa yang dirasakan hari ini), guru memberikan apresiasi, dan kelas ditutup dengan doa syukur.";
-        }
+  const data = {
+    jenjang: document.getElementById('f-jenjang').value,
+    mapel: document.getElementById('f-mapel').value,
+    kelas: document.getElementById('f-kelas').value,
+    materi: document.getElementById('f-materi-pokok').value
+  };
+
+  try {
+    const response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ section, data })
+    });
+
+    const result = await response.json();
+
+    if (result.error) throw new Error(result.error);
+
+    // Isi form dengan hasil AI
+    if (section === 'kbm') {
+      if (result.raw) {
+        // Parse manual untuk KBM
+        const pendahuluan = "Guru membuka dengan salam hangat, doa, dan apersepsi tentang " + data.materi;
+        const inti = result.raw;
+        const penutup = "Refleksi rasa tentang nilai moral " + data.materi + ", apresiasi, dan doa penutup";
         
-        btn.innerHTML = '<i class="fas fa-check"></i> Selesai!';
-        setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
-        bindFormToPreview();
-    }, 1500);
+        document.getElementById('f-kbm-pendahuluan').value = pendahuluan;
+        document.getElementById('f-kbm-inti').value = inti;
+        document.getElementById('f-kbm-penutup').value = penutup;
+      }
+    } else if (section === 'kbc') {
+      if (result.panca_cinta) document.getElementById('f-pancacinta').value = result.panca_cinta;
+      if (result.insersi) document.getElementById('f-kbc-insersi').value = result.insersi;
+      if (result.kontekstual) document.getElementById('f-kbc-kontekstual').value = result.kontekstual;
+    } else if (section === 'cp_tp') {
+      if (result.cp) document.getElementById('f-cp').value = result.cp;
+      if (result.tps && result.tps[0]) document.getElementById('f-tp1').value = result.tps[0];
+      if (result.tps && result.tps[1]) document.getElementById('f-tp2').value = result.tps[1];
+      if (result.tps && result.tps[2]) document.getElementById('f-tp3').value = result.tps[2];
+      if (result.tps && result.tps[3]) document.getElementById('f-tp4').value = result.tps[3];
+    }
+
+    btn.innerHTML = '<i class="fas fa-check"></i> Selesai!';
+    setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
+    bindFormToPreview();
+
+  } catch (error) {
+    alert('❌ Error: ' + error.message);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
 }
 
 // ==========================================
