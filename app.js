@@ -5,6 +5,8 @@ let protaData = [];
 let paguJP = 0;
 let promesData = { Ganjil: [], Genap: [] };
 let currentSemester = 'Ganjil';
+let atpData = { Ganjil: [], Genap: [] };
+let currentATPSemester = 'Ganjil';
 
 // ==========================================
 // NAVIGASI HALAMAN (SPA)
@@ -17,6 +19,7 @@ function switchPage(page) {
     event?.target?.closest('.menu-item')?.classList.add('active');
     
     if (page === 'promes') loadPROMES();
+    if (page === 'atp') loadATP();
 }
 
 // ==========================================
@@ -118,15 +121,11 @@ function saveAndGoPromes() {
         prota: protaData
     };
     localStorage.setItem('kbc_prota_data', JSON.stringify(dataToSave));
-    
-    // Pindah ke halaman PROMES
     switchPage('promes');
-    document.querySelectorAll('.menu-item')[1].classList.add('active');
-    document.querySelectorAll('.menu-item')[0].classList.remove('active');
 }
 
 // ==========================================
-// 4. LOGIKA PROMES (OTAK PEMECAHAN PERTEMUAN)
+// 4. LOGIKA PROMES
 // ==========================================
 function loadPROMES() {
     const saved = localStorage.getItem('kbc_prota_data');
@@ -140,11 +139,9 @@ function loadPROMES() {
     protaData = data.prota;
     paguJP = data.paguJP;
     
-    // Filter bab per semester
     promesData.Ganjil = protaData.filter(item => item.sem === 'Ganjil');
     promesData.Genap = protaData.filter(item => item.sem === 'Genap');
     
-    // Info Banner
     document.getElementById('promes-info-text').innerHTML = 
         `<strong>${data.mapel} Kelas ${data.kelas}</strong> | Total Pagu: <strong>${data.paguJP} JP/Tahun</strong> | ` +
         `Semester Ganjil: <strong>${promesData.Ganjil.reduce((s,i)=>s+i.jp,0)} JP</strong> | ` +
@@ -158,7 +155,7 @@ function loadPROMES() {
 
 function switchSemester(sem) {
     currentSemester = sem;
-    document.querySelectorAll('.sem-tab').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('#promes-content .sem-tab').forEach(el => el.classList.remove('active'));
     event.target.closest('.sem-tab').classList.add('active');
     renderPromesTable();
 }
@@ -173,7 +170,6 @@ function renderPromesTable() {
         return;
     }
     
-    // Hitung JP per minggu dari regulasi
     const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
     const jpPerMinggu = getJPPerMinggu(saved.jenjang, saved.mapel);
     
@@ -207,9 +203,6 @@ function renderPromesTable() {
     document.getElementById('promes-total-pertemuan').textContent = totalPertemuan + ' Pertemuan';
 }
 
-// ==========================================
-// 5. SIMPAN PROMES & LANJUT KE ATP
-// ==========================================
 function saveAndGoATP() {
     const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
     const promesToSave = {
@@ -221,15 +214,12 @@ function saveAndGoATP() {
         }
     };
     localStorage.setItem('kbc_prota_data', JSON.stringify(promesToSave));
-    alert('✅ PROMES berhasil disimpan! Fitur ATP akan segera hadir.');
+    switchPage('atp');
 }
 
 // ==========================================
-// 6. LOGIKA ATP (TUJUAN PEMBELAJARAN PER PERTEMUAN)
+// 5. LOGIKA ATP
 // ==========================================
-let atpData = { Ganjil: [], Genap: [] };
-let currentATPSemester = 'Ganjil';
-
 function loadATP() {
     const saved = localStorage.getItem('kbc_prota_data');
     if (!saved) {
@@ -239,15 +229,12 @@ function loadATP() {
     }
     
     const data = JSON.parse(saved);
-    
-    // Cek apakah PROMES sudah ada
     if (!data.promes) {
         document.getElementById('atp-empty').style.display = 'block';
         document.getElementById('atp-content').style.display = 'none';
         return;
     }
     
-    // Generate TP untuk setiap pertemuan
     const jpPerMinggu = data.promes.jpPerMinggu;
     
     ['Ganjil', 'Genap'].forEach(sem => {
@@ -273,7 +260,6 @@ function loadATP() {
         });
     });
     
-    // Info Banner
     const totalTP = atpData.Ganjil.length + atpData.Genap.length;
     document.getElementById('atp-info-text').innerHTML = 
         `<strong>${data.mapel} Kelas ${data.kelas}</strong> | Total: <strong>${totalTP} Tujuan Pembelajaran</strong> | ` +
@@ -286,7 +272,6 @@ function loadATP() {
 }
 
 function generateTP(bab, elemen, pertemuanKe, totalPertemuan, mapel) {
-    // Pola progresif KBC: Awal → Mendalam → Aplikasi → Manifestasi
     const polaTP = [
         `Peserta didik mampu memahami konsep dasar ${bab} sebagai langkah awal menumbuhkan cinta pada ilmu`,
         `Peserta didik mampu menganalisis prinsip-prinsip ${bab} untuk memperdalam pemahaman dan keyakinan`,
@@ -294,19 +279,12 @@ function generateTP(bab, elemen, pertemuanKe, totalPertemuan, mapel) {
         `Peserta didik mampu mengintegrasikan nilai-nilai ${bab} dalam kehidupan sehari-hari sebagai manifestasi cinta ilmu`
     ];
     
-    // Pilih pola berdasarkan posisi pertemuan
     let polaIndex;
-    if (totalPertemuan === 1) {
-        polaIndex = 0; // Hanya 1 pertemuan, pakai pola awal
-    } else if (pertemuanKe === 1) {
-        polaIndex = 0; // Pertemuan pertama
-    } else if (pertemuanKe === totalPertemuan) {
-        polaIndex = 3; // Pertemuan terakhir
-    } else if (pertemuanKe <= totalPertemuan / 2) {
-        polaIndex = 1; // Tengah awal
-    } else {
-        polaIndex = 2; // Tengah akhir
-    }
+    if (totalPertemuan === 1) polaIndex = 0;
+    else if (pertemuanKe === 1) polaIndex = 0;
+    else if (pertemuanKe === totalPertemuan) polaIndex = 3;
+    else if (pertemuanKe <= totalPertemuan / 2) polaIndex = 1;
+    else polaIndex = 2;
     
     return polaTP[polaIndex];
 }
@@ -370,12 +348,4 @@ function saveAndGoKKTP() {
     saved.atp = atpData;
     localStorage.setItem('kbc_prota_data', JSON.stringify(saved));
     alert('✅ ATP berhasil disimpan! Fitur KKTP akan segera hadir.');
-    // Nanti: switchPage('kktp');
 }
-
-// Update fungsi switchPage untuk load ATP
-const originalSwitchPage = switchPage;
-switchPage = function(page) {
-    originalSwitchPage(page);
-    if (page === 'atp') loadATP();
-};
