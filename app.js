@@ -223,3 +223,159 @@ function saveAndGoATP() {
     localStorage.setItem('kbc_prota_data', JSON.stringify(promesToSave));
     alert('✅ PROMES berhasil disimpan! Fitur ATP akan segera hadir.');
 }
+
+// ==========================================
+// 6. LOGIKA ATP (TUJUAN PEMBELAJARAN PER PERTEMUAN)
+// ==========================================
+let atpData = { Ganjil: [], Genap: [] };
+let currentATPSemester = 'Ganjil';
+
+function loadATP() {
+    const saved = localStorage.getItem('kbc_prota_data');
+    if (!saved) {
+        document.getElementById('atp-empty').style.display = 'block';
+        document.getElementById('atp-content').style.display = 'none';
+        return;
+    }
+    
+    const data = JSON.parse(saved);
+    
+    // Cek apakah PROMES sudah ada
+    if (!data.promes) {
+        document.getElementById('atp-empty').style.display = 'block';
+        document.getElementById('atp-content').style.display = 'none';
+        return;
+    }
+    
+    // Generate TP untuk setiap pertemuan
+    const jpPerMinggu = data.promes.jpPerMinggu;
+    
+    ['Ganjil', 'Genap'].forEach(sem => {
+        atpData[sem] = [];
+        let pertemuanCounter = 1;
+        
+        data.promes[sem].forEach(bab => {
+            const jumlahPertemuan = Math.ceil(bab.jp / jpPerMinggu);
+            
+            for (let i = 0; i < jumlahPertemuan; i++) {
+                const pertemuanKe = pertemuanCounter + i;
+                const tp = generateTP(bab.bab, bab.elemen, pertemuanKe, jumlahPertemuan, data.mapel);
+                
+                atpData[sem].push({
+                    bab: bab.bab,
+                    pertemuan: pertemuanKe,
+                    tp: tp,
+                    jp: jpPerMinggu,
+                    elemen: bab.elemen
+                });
+            }
+            pertemuanCounter += jumlahPertemuan;
+        });
+    });
+    
+    // Info Banner
+    const totalTP = atpData.Ganjil.length + atpData.Genap.length;
+    document.getElementById('atp-info-text').innerHTML = 
+        `<strong>${data.mapel} Kelas ${data.kelas}</strong> | Total: <strong>${totalTP} Tujuan Pembelajaran</strong> | ` +
+        `Ganjil: ${atpData.Ganjil.length} TP | Genap: ${atpData.Genap.length} TP`;
+    
+    document.getElementById('atp-empty').style.display = 'none';
+    document.getElementById('atp-content').style.display = 'block';
+    
+    renderATPTable();
+}
+
+function generateTP(bab, elemen, pertemuanKe, totalPertemuan, mapel) {
+    // Pola progresif KBC: Awal → Mendalam → Aplikasi → Manifestasi
+    const polaTP = [
+        `Peserta didik mampu memahami konsep dasar ${bab} sebagai langkah awal menumbuhkan cinta pada ilmu`,
+        `Peserta didik mampu menganalisis prinsip-prinsip ${bab} untuk memperdalam pemahaman dan keyakinan`,
+        `Peserta didik mampu menerapkan konsep ${bab} dalam konteks nyata sebagai bukti penguasaan materi`,
+        `Peserta didik mampu mengintegrasikan nilai-nilai ${bab} dalam kehidupan sehari-hari sebagai manifestasi cinta ilmu`
+    ];
+    
+    // Pilih pola berdasarkan posisi pertemuan
+    let polaIndex;
+    if (totalPertemuan === 1) {
+        polaIndex = 0; // Hanya 1 pertemuan, pakai pola awal
+    } else if (pertemuanKe === 1) {
+        polaIndex = 0; // Pertemuan pertama
+    } else if (pertemuanKe === totalPertemuan) {
+        polaIndex = 3; // Pertemuan terakhir
+    } else if (pertemuanKe <= totalPertemuan / 2) {
+        polaIndex = 1; // Tengah awal
+    } else {
+        polaIndex = 2; // Tengah akhir
+    }
+    
+    return polaTP[polaIndex];
+}
+
+function switchATPSemester(sem) {
+    currentATPSemester = sem;
+    document.querySelectorAll('#atp-content .sem-tab').forEach(el => el.classList.remove('active'));
+    event.target.closest('.sem-tab').classList.add('active');
+    renderATPTable();
+}
+
+function renderATPTable() {
+    const data = atpData[currentATPSemester];
+    const tbody = document.getElementById('atp-body');
+    tbody.innerHTML = '';
+    
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:40px;">Tidak ada TP untuk semester ${currentATPSemester}.</td></tr>`;
+        return;
+    }
+    
+    let totalJP = 0;
+    
+    data.forEach((item, idx) => {
+        totalJP += item.jp;
+        
+        tbody.innerHTML += `
+        <tr>
+            <td>${idx + 1}</td>
+            <td style="font-size:12px;"><strong>${item.bab}</strong></td>
+            <td style="text-align:center;"><span class="badge">${item.pertemuan}</span></td>
+            <td>
+                <textarea class="tp-input" onchange="updateTP(${idx}, this.value)" rows="2" style="width:100%; font-size:13px; line-height:1.4;">${item.tp}</textarea>
+            </td>
+            <td style="text-align:center; font-weight:bold; color:var(--primary);">${item.jp}</td>
+            <td style="text-align:center;">
+                <button class="btn-icon" onclick="regenerateTP(${idx})" title="Regenerate TP">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </td>
+        </tr>`;
+    });
+    
+    document.getElementById('atp-total-tp').textContent = data.length + ' TP';
+    document.getElementById('atp-total-jp').textContent = totalJP + ' JP';
+}
+
+function updateTP(idx, val) {
+    atpData[currentATPSemester][idx].tp = val;
+}
+
+function regenerateTP(idx) {
+    const item = atpData[currentATPSemester][idx];
+    const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
+    item.tp = generateTP(item.bab, item.elemen, item.pertemuan, 4, saved.mapel);
+    renderATPTable();
+}
+
+function saveAndGoKKTP() {
+    const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
+    saved.atp = atpData;
+    localStorage.setItem('kbc_prota_data', JSON.stringify(saved));
+    alert('✅ ATP berhasil disimpan! Fitur KKTP akan segera hadir.');
+    // Nanti: switchPage('kktp');
+}
+
+// Update fungsi switchPage untuk load ATP
+const originalSwitchPage = switchPage;
+switchPage = function(page) {
+    originalSwitchPage(page);
+    if (page === 'atp') loadATP();
+};
