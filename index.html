@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Generator - PROTA & PROMES</title>
+    <title>KBC Generator - PROTA, PROMES & ATP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -18,7 +18,7 @@
             <ul class="sidebar-menu">
                 <li><a class="menu-item active" onclick="switchPage('prota')"><i class="fas fa-calendar-alt"></i> 1. PROTA</a></li>
                 <li><a class="menu-item" onclick="switchPage('promes')"><i class="fas fa-calendar-week"></i> 2. PROMES</a></li>
-                <li><a class="menu-item disabled"><i class="fas fa-project-diagram"></i> 3. ATP</a></li>
+                <li><a class="menu-item" onclick="switchPage('atp')"><i class="fas fa-project-diagram"></i> 3. ATP</a></li>
                 <li><a class="menu-item disabled"><i class="fas fa-check-double"></i> 4. KKTP</a></li>
                 <li><a class="menu-item disabled"><i class="fas fa-file-invoice"></i> 5. Modul Ajar</a></li>
                 <li><a class="menu-item disabled"><i class="fas fa-clipboard-list"></i> 6. Raport Digital</a></li>
@@ -98,13 +98,11 @@
                 </div>
 
                 <div id="promes-content" style="display:none;">
-                    <!-- Info Banner PROMES -->
                     <div class="info-banner">
                         <i class="fas fa-info-circle"></i>
                         <span id="promes-info-text"></span>
                     </div>
 
-                    <!-- Tab Semester -->
                     <div class="semester-tabs">
                         <button class="sem-tab active" onclick="switchSemester('Ganjil')">
                             <i class="fas fa-leaf"></i> Semester Ganjil
@@ -114,7 +112,6 @@
                         </button>
                     </div>
 
-                    <!-- Tabel PROMES -->
                     <div class="table-container">
                         <table class="interactive-table">
                             <thead>
@@ -146,15 +143,6 @@
                 </div>
             </section>
 
-        </main>
-    </div>
-
-    <script src="database_regulasi.js"></script>
-    <script src="database_buku.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
-
             <!-- ============ HALAMAN 3: ATP ============ -->
             <section id="page-atp" class="page-section">
                 <div class="panel-title">
@@ -170,13 +158,11 @@
                 </div>
 
                 <div id="atp-content" style="display:none;">
-                    <!-- Info Banner ATP -->
                     <div class="info-banner">
                         <i class="fas fa-info-circle"></i>
                         <span id="atp-info-text"></span>
                     </div>
 
-                    <!-- Tab Semester -->
                     <div class="semester-tabs">
                         <button class="sem-tab active" onclick="switchATPSemester('Ganjil')">
                             <i class="fas fa-leaf"></i> Semester Ganjil
@@ -186,7 +172,6 @@
                         </button>
                     </div>
 
-                    <!-- Tabel ATP -->
                     <div class="table-container">
                         <table class="interactive-table">
                             <thead>
@@ -217,3 +202,12 @@
                     </div>
                 </div>
             </section>
+
+        </main>
+    </div>
+
+    <script src="database_regulasi.js"></script>
+    <script src="database_buku.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
