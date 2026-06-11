@@ -681,3 +681,18 @@ body {
   color: var(--error);
   font-weight: 600;
 }
+/* Fix: Lebar Kolom Elemen CP */
+.interactive-table th:nth-child(5),
+.interactive-table td:nth-child(5) {
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.interactive-table td:nth-child(5) input {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+  min-height: 60px;
+  height: auto;
+}
