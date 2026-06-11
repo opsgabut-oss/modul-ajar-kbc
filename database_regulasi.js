@@ -47,3 +47,30 @@ function getTotalJP(jenjang, mapel) {
 function getTotalJPSemester(jenjang, mapel) {
   return getTotalJP(jenjang, mapel) / 2;
 }
+// ==========================================
+// MAPPING ELEMEN CP RESMI KURIKULUM MERDEKA
+// ==========================================
+const CP_ELEMENTS = {
+  "Al-Qur'an Hadis": ["Membaca", "Menghafal", "Menerjemahkan", "Menelaah", "Merefleksi"],
+  "Akidah Akhlak": ["Keimanan", "Akhlak Terpuji", "Akhlak Tercela", "Fiqh Akhlak"],
+  "Fikih": ["Fikih Ibadah", "Fikih Muamalah", "Fikih Siyasah", "Fikih Lingkungan"],
+  "SKI": ["Sejarah Nabi & Sahabat", "Peradaban Islam", "Islam Nusantara", "Tokoh Ulama"],
+  "Bahasa Arab": ["Menyimak", "Membaca", "Menulis", "Berbicara", "Unsur Kebahasaan"],
+  "Matematika": ["Bilangan", "Aljabar", "Pengukuran", "Geometri", "Analisis Data & Peluang"],
+  "Bahasa Indonesia": ["Menyimak", "Membaca & Memirsa", "Menulis", "Berbicara & Mempresentasikan"],
+  "IPA": ["Pemahaman IPA", "Keterampilan Proses IPA", "Dampak IPA"],
+  "IPS": ["Pemahaman IPS", "Keterampilan IPS", "Keterampilan Berpikir Kritis"],
+  "Bahasa Inggris": ["Menyimak", "Membaca & Memirsa", "Menulis", "Berbicara & Mempresentasikan"],
+  "Pendidikan Pancasila": ["Pancasila", "UUD 1945", "Bhinneka Tunggal Ika", "NKRI"],
+  "Informatika": ["Berpikir Komputasional", "TIK", "Sistem Komputer", "Jaringan", "Analisis Data", "Algoritma & Pemrograman"],
+  "Seni Budaya": ["Mengalami", "Menciptakan", "Merefleksikan", "Menganalisis"],
+  "PJOK": ["Keterampilan Gerak", "Pengetahuan Gerak", "Pengembangan Karakter"],
+  "Fisika": ["Pemahaman Konsep", "Keterampilan Proses Sains", "Dampak Fisika"],
+  "Kimia": ["Pemahaman Konsep", "Keterampilan Proses Sains", "Dampak Kimia"],
+  "Biologi": ["Pemahaman Konsep", "Keterampilan Proses Sains", "Dampak Biologi"],
+  "Ekonomi": ["Pemahaman Konsep", "Analisis Ekonomi", "Literasi Keuangan"],
+  "Sosiologi": ["Pemahaman Konsep", "Penelitian Sosial", "Kesadaran Sosial"],
+  "Geografi": ["Pemahaman Konsep", "Keterampilan Geospasial", "Kesadaran Lingkungan"],
+  "Sejarah": ["Pemahaman Sejarah", "Berpikir Sejarah", "Kesadaran Sejarah"],
+  "IPAS": ["Pemahaman IPAS", "Keterampilan Proses Sains", "Dampak IPAS"]
+};
