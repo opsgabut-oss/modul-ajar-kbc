@@ -154,3 +154,66 @@
     <script src="app.js"></script>
 </body>
 </html>
+
+            <!-- ============ HALAMAN 3: ATP ============ -->
+            <section id="page-atp" class="page-section">
+                <div class="panel-title">
+                    <h1>3. Alur Tujuan Pembelajaran (ATP)</h1>
+                    <p>Tujuan Pembelajaran spesifik per pertemuan. Sistem otomatis generate TP kontekstual sesuai materi bab.</p>
+                </div>
+
+                <div id="atp-empty" class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Belum Ada Data PROMES</h3>
+                    <p>Silakan lengkapi halaman PROMES terlebih dahulu sebelum membuat ATP.</p>
+                    <button class="btn btn-primary" onclick="switchPage('promes')"><i class="fas fa-arrow-left"></i> Kembali ke PROMES</button>
+                </div>
+
+                <div id="atp-content" style="display:none;">
+                    <!-- Info Banner ATP -->
+                    <div class="info-banner">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="atp-info-text"></span>
+                    </div>
+
+                    <!-- Tab Semester -->
+                    <div class="semester-tabs">
+                        <button class="sem-tab active" onclick="switchATPSemester('Ganjil')">
+                            <i class="fas fa-leaf"></i> Semester Ganjil
+                        </button>
+                        <button class="sem-tab" onclick="switchATPSemester('Genap')">
+                            <i class="fas fa-sun"></i> Semester Genap
+                        </button>
+                    </div>
+
+                    <!-- Tabel ATP -->
+                    <div class="table-container">
+                        <table class="interactive-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">No</th>
+                                    <th style="width: 15%;">Bab</th>
+                                    <th style="width: 10%;">Pertemuan</th>
+                                    <th style="width: 50%;">Tujuan Pembelajaran (TP)</th>
+                                    <th style="width: 10%;">JP</th>
+                                    <th style="width: 10%;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="atp-body"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" style="font-weight:bold;">Total Semester</td>
+                                    <td id="atp-total-tp" style="font-weight:bold;">0 TP</td>
+                                    <td id="atp-total-jp" style="color:var(--primary); font-weight:bold;">0 JP</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-secondary" onclick="switchPage('promes')"><i class="fas fa-arrow-left"></i> Kembali ke PROMES</button>
+                        <button class="btn btn-primary" onclick="saveAndGoKKTP()"><i class="fas fa-arrow-right"></i> Simpan & Lanjut ke KKTP</button>
+                    </div>
+                </div>
+            </section>
