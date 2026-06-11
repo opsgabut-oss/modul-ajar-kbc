@@ -10,14 +10,34 @@ let currentATPSemester = 'Ganjil';
 let kktpData = { method: 'interval', criteria: {} };
 
 // ==========================================
-// NAVIGASI HALAMAN (SPA)
+// NAVIGASI HALAMAN (SPA) - FIXED VERSION
 // ==========================================
 function switchPage(page) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
     
     document.getElementById('page-' + page).classList.add('active');
-    event?.target?.closest('.menu-item')?.classList.add('active');
+    
+    // FIX: Cek dulu apakah menu item ada sebelum add class
+    const menuItem = event?.target?.closest('.menu-item');
+    if (menuItem) menuItem.classList.add('active');
+    
+    if (page === 'promes') loadPROMES();
+    if (page === 'atp') loadATP();
+    if (page === 'kktp') loadKKTP();
+}
+
+// Helper untuk pindah halaman manual (tanpa event)
+function goToPage(page) {
+    document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById('page-' + page).classList.add('active');
+    
+    // Aktifkan menu item yang sesuai
+    const menuIndex = { 'prota': 0, 'promes': 1, 'atp': 2, 'kktp': 3, 'modul': 4, 'raport': 5 };
+    const menus = document.querySelectorAll('.menu-item');
+    if (menus[menuIndex[page]]) menus[menuIndex[page]].classList.add('active');
     
     if (page === 'promes') loadPROMES();
     if (page === 'atp') loadATP();
@@ -91,7 +111,7 @@ function validateJP() {
     document.getElementById('total-jp').textContent = total;
     const status = document.getElementById('status-validasi');
     if (total === paguJP) { status.textContent = '✅ Sesuai Pagu'; status.style.color = 'var(--success)'; }
-    else if (total < paguJP) { status.textContent = `️ Kurang ${paguJP - total} JP`; status.style.color = 'var(--warning)'; }
+    else if (total < paguJP) { status.textContent = `⚠️ Kurang ${paguJP - total} JP`; status.style.color = 'var(--warning)'; }
     else { status.textContent = `❌ Melebihi ${total - paguJP} JP`; status.style.color = 'var(--error)'; }
 }
 
@@ -101,7 +121,7 @@ function saveAndGoPromes() {
     if (total !== paguJP) return alert(`⚠️ Total JP (${total}) belum sesuai pagu (${paguJP}).`);
     const dataToSave = { jenjang: document.getElementById('f-jenjang').value, kelas: document.getElementById('f-kelas').value, mapel: document.getElementById('f-mapel').value, paguJP: paguJP, prota: protaData };
     localStorage.setItem('kbc_prota_data', JSON.stringify(dataToSave));
-    switchPage('promes');
+    goToPage('promes');
 }
 
 // ==========================================
@@ -148,36 +168,58 @@ function renderPromesTable() {
 }
 
 function saveAndGoATP() {
-    const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
-    const promesToSave = { ...saved, promes: { Ganjil: promesData.Ganjil, Genap: promesData.Genap, jpPerMinggu: getJPPerMinggu(saved.jenjang, saved.mapel) } };
-    localStorage.setItem('kbc_prota_data', JSON.stringify(promesToSave));
-    switchPage('atp');
+    try {
+        const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
+        if (!saved) return alert('⚠️ Data PROTA tidak ditemukan!');
+        
+        const promesToSave = { ...saved, promes: { Ganjil: promesData.Ganjil, Genap: promesData.Genap, jpPerMinggu: getJPPerMinggu(saved.jenjang, saved.mapel) } };
+        localStorage.setItem('kbc_prota_data', JSON.stringify(promesToSave));
+        
+        // Pindah ke halaman ATP menggunakan goToPage (bukan switchPage)
+        goToPage('atp');
+    } catch (error) {
+        console.error('Error saveAndGoATP:', error);
+        alert('❌ Error: ' + error.message);
+    }
 }
 
 // ==========================================
 // 4. LOGIKA ATP
 // ==========================================
 function loadATP() {
-    const saved = localStorage.getItem('kbc_prota_data');
-    if (!saved || !saved.promes) { document.getElementById('atp-empty').style.display = 'block'; document.getElementById('atp-content').style.display = 'none'; return; }
-    const data = JSON.parse(saved);
-    const jpPerMinggu = data.promes.jpPerMinggu;
-    ['Ganjil', 'Genap'].forEach(sem => {
-        atpData[sem] = []; let pertemuanCounter = 1;
-        data.promes[sem].forEach(bab => {
-            const jumlahPertemuan = Math.ceil(bab.jp / jpPerMinggu);
-            for (let i = 0; i < jumlahPertemuan; i++) {
-                const pertemuanKe = pertemuanCounter + i;
-                const tp = generateTP(bab.bab, bab.elemen, pertemuanKe, jumlahPertemuan, data.mapel);
-                atpData[sem].push({ bab: bab.bab, pertemuan: pertemuanKe, tp: tp, jp: jpPerMinggu, elemen: bab.elemen });
-            }
-            pertemuanCounter += jumlahPertemuan;
+    try {
+        const saved = localStorage.getItem('kbc_prota_data');
+        if (!saved) { document.getElementById('atp-empty').style.display = 'block'; document.getElementById('atp-content').style.display = 'none'; return; }
+        
+        const data = JSON.parse(saved);
+        if (!data.promes) { document.getElementById('atp-empty').style.display = 'block'; document.getElementById('atp-content').style.display = 'none'; return; }
+        
+        const jpPerMinggu = data.promes.jpPerMinggu;
+        
+        ['Ganjil', 'Genap'].forEach(sem => {
+            atpData[sem] = []; let pertemuanCounter = 1;
+            data.promes[sem].forEach(bab => {
+                const jumlahPertemuan = Math.ceil(bab.jp / jpPerMinggu);
+                for (let i = 0; i < jumlahPertemuan; i++) {
+                    const pertemuanKe = pertemuanCounter + i;
+                    const tp = generateTP(bab.bab, bab.elemen, pertemuanKe, jumlahPertemuan, data.mapel);
+                    atpData[sem].push({ bab: bab.bab, pertemuan: pertemuanKe, tp: tp, jp: jpPerMinggu, elemen: bab.elemen });
+                }
+                pertemuanCounter += jumlahPertemuan;
+            });
         });
-    });
-    const totalTP = atpData.Ganjil.length + atpData.Genap.length;
-    document.getElementById('atp-info-text').innerHTML = `<strong>${data.mapel} Kelas ${data.kelas}</strong> | Total: <strong>${totalTP} Tujuan Pembelajaran</strong> | Ganjil: ${atpData.Ganjil.length} TP | Genap: ${atpData.Genap.length} TP`;
-    document.getElementById('atp-empty').style.display = 'none'; document.getElementById('atp-content').style.display = 'block';
-    renderATPTable();
+        
+        const totalTP = atpData.Ganjil.length + atpData.Genap.length;
+        document.getElementById('atp-info-text').innerHTML = `<strong>${data.mapel} Kelas ${data.kelas}</strong> | Total: <strong>${totalTP} Tujuan Pembelajaran</strong> | Ganjil: ${atpData.Ganjil.length} TP | Genap: ${atpData.Genap.length} TP`;
+        
+        document.getElementById('atp-empty').style.display = 'none';
+        document.getElementById('atp-content').style.display = 'block';
+        
+        renderATPTable();
+    } catch (error) {
+        console.error('Error loadATP:', error);
+        alert('❌ Error: ' + error.message);
+    }
 }
 
 function generateTP(bab, elemen, pertemuanKe, totalPertemuan, mapel) {
@@ -229,7 +271,7 @@ function saveAndGoKKTP() {
     const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
     saved.atp = atpData;
     localStorage.setItem('kbc_prota_data', JSON.stringify(saved));
-    switchPage('kktp');
+    goToPage('kktp');
 }
 
 // ==========================================
