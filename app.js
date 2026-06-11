@@ -83,8 +83,9 @@ function generatePROTA() {
         const jp = jpPerBab + (sisaJP > 0 ? 1 : 0);
         sisaJP = Math.max(0, sisaJP - 1);
         
-        // Default Elemen CP (bisa diedit user)
-        const elemenDefault = 'Memahami & Menerapkan';
+        // Auto-fill Elemen CP sesuai Mapel (Resmi Kurikulum Merdeka)
+        const cpList = CP_ELEMENTS[mapel] || ['Kompetensi Inti'];
+        const elemenDefault = cpList.join(' & ');
 
         protaData.push({ no: idx + 1, bab, sem, jp, elemen: elemenDefault });
         
