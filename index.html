@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KBC Generator - PROTA</title>
+    <title>KBC Generator - PROTA & PROMES</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,86 +16,139 @@
                 <div class="brand-name">KBC Generator<span>KMA 1503/2025</span></div>
             </div>
             <ul class="sidebar-menu">
-                <li><a class="menu-item active"><i class="fas fa-calendar-alt"></i> 1. PROTA</a></li>
-                <li><a class="menu-item"><i class="fas fa-calendar-week"></i> 2. PROMES</a></li>
-                <li><a class="menu-item"><i class="fas fa-project-diagram"></i> 3. ATP</a></li>
-                <li><a class="menu-item"><i class="fas fa-check-double"></i> 4. KKTP</a></li>
-                <li><a class="menu-item"><i class="fas fa-file-invoice"></i> 5. Modul Ajar</a></li>
-                <li><a class="menu-item"><i class="fas fa-clipboard-list"></i> 6. Raport Digital</a></li>
+                <li><a class="menu-item active" onclick="switchPage('prota')"><i class="fas fa-calendar-alt"></i> 1. PROTA</a></li>
+                <li><a class="menu-item" onclick="switchPage('promes')"><i class="fas fa-calendar-week"></i> 2. PROMES</a></li>
+                <li><a class="menu-item disabled"><i class="fas fa-project-diagram"></i> 3. ATP</a></li>
+                <li><a class="menu-item disabled"><i class="fas fa-check-double"></i> 4. KKTP</a></li>
+                <li><a class="menu-item disabled"><i class="fas fa-file-invoice"></i> 5. Modul Ajar</a></li>
+                <li><a class="menu-item disabled"><i class="fas fa-clipboard-list"></i> 6. Raport Digital</a></li>
             </ul>
             <div class="sidebar-footer"><p>KBC Generator v3.0<br>© 2026 Kemenag Madrasah</p></div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <div class="panel-title">
-                <h1>Program Tahunan (PROTA)</h1>
-                <p>Auto-load bab & alokasi JP sesuai KMA 1503/2025. Sistem otomatis membagi pagu JP ke setiap bab.</p>
-            </div>
+            
+            <!-- ============ HALAMAN 1: PROTA ============ -->
+            <section id="page-prota" class="page-section active">
+                <div class="panel-title">
+                    <h1>1. Program Tahunan (PROTA)</h1>
+                    <p>Auto-load bab & alokasi JP sesuai KMA 1503/2025. Sistem otomatis membagi pagu JP ke setiap bab.</p>
+                </div>
 
-            <!-- FILTER BAR -->
-            <div class="filter-bar">
-                <select id="f-jenjang" class="form-control">
-                    <option value="">Pilih Jenjang</option>
-                    <option value="MI">MI</option>
-                    <option value="MTs">MTs</option>
-                    <option value="MA">MA</option>
-                </select>
-                <select id="f-kelas" class="form-control">
-                    <option value="">Pilih Kelas</option>
-                </select>
-                <select id="f-mapel" class="form-control">
-                    <option value="">Pilih Mata Pelajaran</option>
-                </select>
-                <button class="btn btn-primary" onclick="generatePROTA()">
-                    <i class="fas fa-magic"></i> Generate PROTA
-                </button>
-            </div>
+                <div class="filter-bar">
+                    <select id="f-jenjang" class="form-control">
+                        <option value="">Pilih Jenjang</option>
+                        <option value="MI">MI</option>
+                        <option value="MTs">MTs</option>
+                        <option value="MA">MA</option>
+                    </select>
+                    <select id="f-kelas" class="form-control"><option value="">Pilih Kelas</option></select>
+                    <select id="f-mapel" class="form-control"><option value="">Pilih Mata Pelajaran</option></select>
+                    <button class="btn btn-primary" onclick="generatePROTA()"><i class="fas fa-magic"></i> Generate PROTA</button>
+                </div>
 
-            <!-- INFO BANNER PAGU -->
-            <div id="pagu-info" class="info-banner" style="display:none;">
-                <i class="fas fa-info-circle"></i> 
-                <span id="pagu-text"></span>
-            </div>
+                <div id="pagu-info" class="info-banner" style="display:none;">
+                    <i class="fas fa-info-circle"></i> 
+                    <span id="pagu-text"></span>
+                </div>
 
-            <!-- TABEL PROTA -->
-            <div class="table-container">
-                <table class="interactive-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 5%;">No</th>
-                            <th style="width: 40%;">Bab / Materi Pokok</th>
-                            <th style="width: 15%;">Semester</th>
-                            <th style="width: 15%;">Alokasi JP</th>
-                            <th style="width: 25%;">Elemen CP</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prota-body">
-                        <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Silakan pilih Jenjang, Kelas, dan Mapel lalu klik Generate.</td></tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3" style="font-weight:bold;">Total JP Terpakai</td>
-                            <td id="total-jp" style="color:var(--primary); font-weight:bold;">0</td>
-                            <td id="status-validasi" style="font-weight:bold;">-</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+                <div class="table-container">
+                    <table class="interactive-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 40%;">Bab / Materi Pokok</th>
+                                <th style="width: 12%;">Semester</th>
+                                <th style="width: 13%;">Alokasi JP</th>
+                                <th style="width: 30%;">Elemen CP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prota-body">
+                            <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:40px;">Silakan pilih Jenjang, Kelas, dan Mapel lalu klik Generate.</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="font-weight:bold;">Total JP Terpakai</td>
+                                <td id="total-jp" style="color:var(--primary); font-weight:bold;">0</td>
+                                <td id="status-validasi" style="font-weight:bold;">-</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
 
-            <!-- ACTION BAR -->
-            <div class="action-bar">
-                <button class="btn btn-secondary" onclick="validateJP()">
-                    <i class="fas fa-calculator"></i> Validasi JP
-                </button>
-                <button class="btn btn-primary" onclick="savePROTA()">
-                    <i class="fas fa-save"></i> Simpan & Lanjut ke PROMES
-                </button>
-            </div>
+                <div class="action-bar">
+                    <button class="btn btn-secondary" onclick="validateJP()"><i class="fas fa-calculator"></i> Validasi JP</button>
+                    <button class="btn btn-primary" onclick="saveAndGoPromes()"><i class="fas fa-arrow-right"></i> Simpan & Lanjut ke PROMES</button>
+                </div>
+            </section>
+
+            <!-- ============ HALAMAN 2: PROMES ============ -->
+            <section id="page-promes" class="page-section">
+                <div class="panel-title">
+                    <h1>2. Program Semester (PROMES)</h1>
+                    <p>Pemetaan otomatis Bab menjadi Pertemuan berdasarkan data PROTA. Pilih semester untuk melihat detail.</p>
+                </div>
+
+                <div id="promes-empty" class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Belum Ada Data PROTA</h3>
+                    <p>Silakan lengkapi halaman PROTA terlebih dahulu sebelum membuat PROMES.</p>
+                    <button class="btn btn-primary" onclick="switchPage('prota')"><i class="fas fa-arrow-left"></i> Kembali ke PROTA</button>
+                </div>
+
+                <div id="promes-content" style="display:none;">
+                    <!-- Info Banner PROMES -->
+                    <div class="info-banner">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="promes-info-text"></span>
+                    </div>
+
+                    <!-- Tab Semester -->
+                    <div class="semester-tabs">
+                        <button class="sem-tab active" onclick="switchSemester('Ganjil')">
+                            <i class="fas fa-leaf"></i> Semester Ganjil
+                        </button>
+                        <button class="sem-tab" onclick="switchSemester('Genap')">
+                            <i class="fas fa-sun"></i> Semester Genap
+                        </button>
+                    </div>
+
+                    <!-- Tabel PROMES -->
+                    <div class="table-container">
+                        <table class="interactive-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%;">No</th>
+                                    <th style="width: 30%;">Bab / Materi Pokok</th>
+                                    <th style="width: 12%;">Alokasi JP</th>
+                                    <th style="width: 18%;">Pertemuan Ke-</th>
+                                    <th style="width: 10%;">Jumlah Pertemuan</th>
+                                    <th style="width: 25%;">Elemen CP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="promes-body"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" style="font-weight:bold;">Total Semester</td>
+                                    <td id="promes-total-jp" style="color:var(--primary); font-weight:bold;">0</td>
+                                    <td colspan="2" id="promes-total-pertemuan" style="font-weight:bold;">0 Pertemuan</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="action-bar">
+                        <button class="btn btn-secondary" onclick="switchPage('prota')"><i class="fas fa-arrow-left"></i> Kembali ke PROTA</button>
+                        <button class="btn btn-primary" onclick="saveAndGoATP()"><i class="fas fa-arrow-right"></i> Simpan & Lanjut ke ATP</button>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
-    <!-- LOAD SCRIPTS -->
     <script src="database_regulasi.js"></script>
     <script src="database_buku.js"></script>
     <script src="app.js"></script>
