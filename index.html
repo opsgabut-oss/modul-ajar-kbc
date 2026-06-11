@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KBC Perangkat Ajar Generator - KMA 1503/2025</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon"><i class="fas fa-heart-pulse"></i></div>
+                <div class="brand-name">KBC Generator<span>KMA 1503 Tahun 2025</span></div>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a id="menu-dashboard" class="menu-item active" onclick="switchSection('dashboard')"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                <li><a id="menu-modul" class="menu-item" onclick="switchSection('modul')"><i class="fas fa-file-invoice"></i> Modul Ajar (KBC)</a></li>
+                <li><a id="menu-prota" class="menu-item" onclick="switchSection('prota')"><i class="fas fa-calendar-alt"></i> Program Tahunan</a></li>
+                <li><a id="menu-promes" class="menu-item" onclick="switchSection('promes')"><i class="fas fa-calendar-week"></i> Program Semester</a></li>
+                <li><a id="menu-drafts" class="menu-item" onclick="switchSection('drafts')"><i class="fas fa-folder-open"></i> Draf Tersimpan</a></li>
+            </ul>
+            <div class="sidebar-footer"><p>KBC Generator v2.0<br>© 2026 Kemenag Madrasah</p></div>
+        </aside>
+
+        <!-- MAIN WRAPPER -->
+        <div class="main-wrapper">
+            <!-- EDITOR PANEL -->
+            <main class="editor-panel">
+                
+                <!-- DASHBOARD -->
+                <section id="sec-dashboard" class="view-section active">
+                    <div class="panel-title">
+                        <h1>Dasbor Perangkat Pembelajaran</h1>
+                        <p>Selamat datang di platform penyusunan perangkat ajar Kurikulum Berbasis Cinta (KBC) KMA 1503 Tahun 2025.</p>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="stats-card"><h3>Total Draf Modul</h3><div class="value" id="stat-total-drafts">0</div></div>
+                        <div class="stats-card"><h3>Jenjang Aktif</h3><div class="value" id="stat-active-level">MI</div></div>
+                        <div class="stats-card"><h3>Tema Panca Cinta</h3><div class="value" style="font-size:14px;margin-top:15px;color:var(--primary)" id="stat-pancacinta">Cinta Allah & Rasul</div></div>
+                    </div>
+                    <div class="guide-box">
+                        <h2><i class="fas fa-info-circle"></i> Alur Kerja:</h2>
+                        <ul>
+                            <li><i class="fas fa-1"></i><div><strong>Pilih Jenjang & Mapel:</strong> Sistem akan auto-load buku paket resmi dari database.</div></li>
+                            <li><i class="fas fa-2"></i><div><strong>Auto-Generate AI:</strong> Klik tombol "✨ Auto-Generate" untuk isi CP, TP, KBM otomatis.</div></li>
+                            <li><i class="fas fa-3"></i><div><strong>Edit & Preview:</strong> Sesuaikan hasil AI, lihat preview real-time di panel kanan.</div></li>
+                            <li><i class="fas fa-4"></i><div><strong>Export:</strong> Download sebagai Word atau cetak ke PDF.</div></li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- MODUL AJAR WIZARD -->
+                <section id="sec-modul" class="view-section">
+                    <div class="panel-title" style="margin-bottom:20px">
+                        <h1>Penyusunan Modul Ajar KBC</h1>
+                        <p>Isi formulir secara bertahap untuk menghasilkan rencana pembelajaran terintegrasi.</p>
+                    </div>
+                    
+                    <div class="wizard-tabs">
+                        <button type="button" class="tab-btn active" onclick="switchWizardStep(1)">1. Identitas</button>
+                        <button type="button" class="tab-btn" onclick="switchWizardStep(2)">2. Komponen KBC</button>
+                        <button type="button" class="tab-btn" onclick="switchWizardStep(3)">3. Desain & CP</button>
+                        <button type="button" class="tab-btn" onclick="switchWizardStep(4)">4. Langkah KBM</button>
+                        <button type="button" class="tab-btn" onclick="switchWizardStep(5)">5. Asesmen</button>
+                    </div>
+
+                    <form id="kbc-modul-form" onsubmit="event.preventDefault()">
+                        <!-- STEP 1: IDENTITAS -->
+                        <div id="step-1" class="form-step active">
+                            <div class="form-grid-2">
+                                <div class="form-group"><label>Nama Madrasah / Sekolah</label><input type="text" id="f-madrasah" class="form-control" placeholder="Nama Madrasah Anda" oninput="bindFormToPreview()"></div>
+                                <div class="form-group"><label>Nama Penyusun</label><input type="text" id="f-penyusun" class="form-control" placeholder="Nama Guru Penyusun" oninput="bindFormToPreview()"></div>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group"><label>Jenjang Madrasah</label><select id="f-jenjang" class="form-control" onchange="updateSubjectDropdown()"><option value="MI">MI (Madrasah Ibtidaiyah)</option><option value="MTs">MTs (Madrasah Tsanawiyah)</option><option value="MA">MA (Madrasah Aliyah)</option></select></div>
+                                <div class="form-group"><label>Mata Pelajaran</label><select id="f-mapel" class="form-control" onchange="onMapelChange()"><option value="">Pilih Jenjang Dulu</option></select></div>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group"><label>Pilih Kelas</label><select id="f-kelas" class="form-control" onchange="onKelasChange()"><option value="">Pilih Mapel Dulu</option></select></div>
+                                <div class="form-group"><label>Semester</label><select id="f-semester" class="form-control" onchange="onSemesterChange()"><option value="Ganjil">Semester I (Ganjil)</option><option value="Genap">Semester II (Genap)</option></select></div>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group"><label>Alokasi Waktu (Total JP)</label><input type="text" id="f-alokasi" class="form-control" placeholder="Contoh: 4 JP (2 Pertemuan)" oninput="bindFormToPreview()"></div>
+                                <div class="form-group"><label>Tahun Pelajaran</label><input type="text" id="f-tapel" class="form-control" value="2026/2027" oninput="bindFormToPreview()"></div>
+                            </div>
+                            <div class="form-group"><label>Rujukan Buku Paket Resmi</label><select id="f-bukupaket" class="form-control" onchange="applyBukuPaketChapter()"><option value="">Pilih Kelas & Mapel</option></select></div>
+                            <div class="form-group"><label>Materi Pokok / Bab Utama</label><input type="text" id="f-materi-pokok" class="form-control" placeholder="Judul Bab / Tema Utama" oninput="bindFormToPreview()"></div>
+                            <div class="form-group"><label>Pengetahuan / Kompetensi Awal</label><textarea id="f-kompetensi-awal" class="form-control" placeholder="Pengetahuan dasar siswa sebelum bab ini" oninput="bindFormToPreview()"></textarea></div>
+                            <div class="btn-row"><div></div><button type="button" class="btn btn-primary" onclick="switchWizardStep(2)">Lanjut <i class="fas fa-chevron-right"></i></button></div>
+                        </div>
+
+                        <!-- STEP 2: KOMPONEN KBC -->
+                        <div id="step-2" class="form-step">
+                            <div class="form-group">
+                                <label>Tema Panca Cinta KMA 1503</label>
+                                <div style="display:flex;gap:10px">
+                                    <input type="text" id="f-pancacinta" class="form-control" readonly style="flex:1;background:rgba(99,102,241,0.08);font-weight:bold;color:var(--accent)">
+                                    <button type="button" class="btn btn-accent" onclick="generateAI('kbc')" style="white-space:nowrap"><i class="fas fa-magic"></i> Auto</button>
+                                </div>
+                            </div>
+                            <div class="form-group"><label>Materi Insersi Nilai Cinta</label><textarea id="f-kbc-insersi" class="form-control" placeholder="Nilai spiritual/keimanan yang ditanamkan..." oninput="bindFormToPreview()"></textarea></div>
+                            <div class="form-group"><label>Topik Pembelajaran Kontekstual</label><input type="text" id="f-kbc-kontekstual" class="form-control" placeholder="Contoh: Memaknai [Materi] sebagai Surat Cinta dari Allah..." oninput="bindFormToPreview()"></div>
+                            <div class="form-group">
+                                <label>Iklim & Budaya Madrasah</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item"><input type="checkbox" id="c-budaya-3s" checked onchange="bindFormToPreview()"><span>Membiasakan budaya 3S (Salam, Sapa, Senyum).</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" id="c-budaya-doa" checked onchange="bindFormToPreview()"><span>Memulai dan mengakhiri dengan doa bersama.</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" id="c-budaya-tadarus" checked onchange="bindFormToPreview()"><span>Literasi / tadarus singkat sebelum belajar.</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" id="c-budaya-aman" checked onchange="bindFormToPreview()"><span>Suasana aman, saling menghargai, cinta ilmu.</span></label>
+                                </div>
+                            </div>
+                            <div class="btn-row"><button type="button" class="btn btn-secondary" onclick="switchWizardStep(1)"><i class="fas fa-chevron-left"></i> Kembali</button><button type="button" class="btn btn-primary" onclick="switchWizardStep(3)">Lanjut <i class="fas fa-chevron-right"></i></button></div>
+                        </div>
+
+                        <!-- STEP 3: DESAIN & CP -->
+                        <div id="step-3" class="form-step">
+                            <div class="form-group">
+                                <label>Capaian Pembelajaran (CP) Resmi</label>
+                                <div style="display:flex;gap:10px;margin-bottom:10px"><button type="button" class="btn btn-primary" onclick="generateAI('cp_tp')"><i class="fas fa-magic"></i> Auto-Generate CP & TP</button></div>
+                                <textarea id="f-cp" class="form-control" style="min-height:90px" placeholder="Salin dan tempel Capaian Pembelajaran resmi..." oninput="bindFormToPreview()"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Tujuan Pembelajaran (TP) per Pertemuan</label>
+                                <div class="form-grid-2"><input type="text" id="f-tp1" class="form-control" placeholder="Tujuan Pertemuan 1" oninput="bindFormToPreview()"><input type="text" id="f-tp1-jp" class="form-control text-center" value="2 JP" oninput="bindFormToPreview()"></div>
+                                <div class="form-grid-2" style="margin-top:8px"><input type="text" id="f-tp2" class="form-control" placeholder="Tujuan Pertemuan 2" oninput="bindFormToPreview()"><input type="text" id="f-tp2-jp" class="form-control text-center" value="2 JP" oninput="bindFormToPreview()"></div>
+                                <div class="form-grid-2" style="margin-top:8px"><input type="text" id="f-tp3" class="form-control" placeholder="Tujuan Pertemuan 3" oninput="bindFormToPreview()"><input type="text" id="f-tp3-jp" class="form-control text-center" value="2 JP" oninput="bindFormToPreview()"></div>
+                                <div class="form-grid-2" style="margin-top:8px"><input type="text" id="f-tp4" class="form-control" placeholder="Tujuan Pertemuan 4" oninput="bindFormToPreview()"><input type="text" id="f-tp4-jp" class="form-control text-center" value="2 JP" oninput="bindFormToPreview()"></div>
+                            </div>
+                            <div class="form-group">
+                                <label>Strategi Deep Learning</label>
+                                <div class="form-group" style="margin-bottom:8px"><span style="font-size:11px;font-weight:bold;color:var(--primary)">Mindful Learning</span><input type="text" id="f-deep-mindful" class="form-control" value="Mengajak peserta didik merenungi keagungan materi dengan melibatkan emosi dan ketenangan jiwa." oninput="bindFormToPreview()"></div>
+                                <div class="form-group" style="margin-bottom:8px"><span style="font-size:11px;font-weight:bold;color:var(--primary)">Meaningful Learning</span><input type="text" id="f-deep-meaningful" class="form-control" value="Menghubungkan setiap konsep teoritis dengan relevansi nyata di kehidupan sehari-hari." oninput="bindFormToPreview()"></div>
+                                <div class="form-group" style="margin-bottom:8px"><span style="font-size:11px;font-weight:bold;color:var(--primary)">Joyful Learning</span><input type="text" id="f-deep-joyful" class="form-control" value="Menggunakan metode diskusi aktif, game edukatif, dan ruang kreasi kolaboratif." oninput="bindFormToPreview()"></div>
+                            </div>
+                            <div class="btn-row"><button type="button" class="btn btn-secondary" onclick="switchWizardStep(2)"><i class="fas fa-chevron-left"></i> Kembali</button><button type="button" class="btn btn-primary" onclick="switchWizardStep(4)">Lanjut <i class="fas fa-chevron-right"></i></button></div>
+                        </div>
+
+                        <!-- STEP 4: LANGKAH KBM -->
+                        <div id="step-4" class="form-step">
+                            <div style="background:rgba(99,102,241,0.05);padding:14px;border:1px dashed rgba(99,102,241,0.2);border-radius:8px;margin-bottom:16px">
+                                <span style="font-size:11px;font-weight:700;color:var(--accent);display:block;margin-bottom:4px">PRO-TIP: LANGKAH BERDIFERENSIASI</span>
+                                <p style="font-size:11px;color:#94a3b8;line-height:1.4;margin:0">Langkah inti mencakup Refleksi (Mindful), Konseptual (Meaningful), dan Kelompok (Joyful).</p>
+                                <button type="button" class="btn btn-chip btn-sm" style="margin-top:8px" onclick="loadDefaultKbmSteps()">Gunakan Draf Bawaan</button>
+                                <button type="button" class="btn btn-chip btn-sm" style="margin-top:8px;margin-left:8px" onclick="generateAI('kbm')"><i class="fas fa-magic"></i> Auto-Generate</button>
+                            </div>
+                            <div class="form-group"><label>1. Kegiatan Pendahuluan (10 Menit)</label><textarea id="f-kbm-pendahuluan" class="form-control" style="min-height:100px" placeholder="Pembukaan dengan cinta, koneksi hati, apersepsi..." oninput="bindFormToPreview()"></textarea></div>
+                            <div class="form-group"><label>2. Kegiatan Inti (60 Menit)</label><textarea id="f-kbm-inti" class="form-control" style="min-height:160px" placeholder="Mindful, Meaningful, Joyful, Diferensiasi..." oninput="bindFormToPreview()"></textarea></div>
+                            <div class="form-group"><label>3. Kegiatan Penutup (10 Menit)</label><textarea id="f-kbm-penutup" class="form-control" style="min-height:80px" placeholder="Refleksi rasa, apresiasi, doa penutup..." oninput="bindFormToPreview()"></textarea></div>
+                            <div class="btn-row"><button type="button" class="btn btn-secondary" onclick="switchWizardStep(3)"><i class="fas fa-chevron-left"></i> Kembali</button><button type="button" class="btn btn-primary" onclick="switchWizardStep(5)">Lanjut <i class="fas fa-chevron-right"></i></button></div>
+                        </div>
+
+                        <!-- STEP 5: ASESMEN -->
+                        <div id="step-5" class="form-step">
+                            <div class="form-group"><label>Pemanfaatan Media Digital</label><input type="text" id="f-media-digital" class="form-control" value="LCD Proyektor, Google Slides, video YouTube, Wordwall" oninput="bindFormToPreview()"></div>
+                            <div class="form-group"><label>Asesmen Afektif (Sikap Cinta Ilmu)</label><textarea id="f-asesmen-afektif" class="form-control" placeholder="Lembar observasi sikap kritis, kesantunan, karakter 3S..." oninput="bindFormToPreview()"></textarea></div>
+                            <div class="form-group"><label>Asesmen Kriteria Ketuntasan (KKTP)</label><textarea id="f-asesmen-kktp" class="form-control" placeholder="Rubrik ketercapaian, LKPD, tes tertulis..." oninput="bindFormToPreview()"></textarea></div>
+                            <div style="background:var(--primary-light);padding:14px;border-radius:8px;font-size:12px;line-height:1.5;margin-bottom:20px"><i class="fas fa-check-circle text-primary"></i> <strong>Selesai!</strong> Periksa preview di panel kanan. Export ke Word atau PDF.</div>
+                            <div class="btn-row"><button type="button" class="btn btn-secondary" onclick="switchWizardStep(4)"><i class="fas fa-chevron-left"></i> Kembali</button><button type="button" class="btn btn-primary" onclick="saveDraft()"><i class="fas fa-save"></i> Simpan Draf</button></div>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- PROTA -->
+                <section id="sec-prota" class="view-section">
+                    <div class="panel-title" style="margin-bottom:20px"><h1>Program Tahunan (PROTA)</h1><p>Alokasi waktu JP per Bab dalam satu Tahun Pelajaran.</p></div>
+                    <div class="grid-container"><table class="interactive-table" id="prota-table-editor"><thead><tr><th style="width:8%">No</th><th>Tujuan Pembelajaran / Bab</th><th style="width:25%">Alokasi Waktu</th><th style="width:15%">Aksi</th></tr></thead><tbody id="prota-editor-body"></tbody></table></div>
+                    <div class="btn-row"><button type="button" class="btn btn-secondary" onclick="addProtaRow()"><i class="fas fa-plus"></i> Tambah Baris</button><button type="button" class="btn btn-primary" onclick="saveProtaChanges()"><i class="fas fa-sync-alt"></i> Terapkan</button></div>
+                </section>
+
+                <!-- PROMES -->
+                <section id="sec-promes" class="view-section">
+                    <div class="panel-title" style="margin-bottom:20px"><h1>Program Semester (PROMES)</h1><p>Petakan jadwal mingguan TP dalam satu semester.</p></div>
+                    <div class="form-group" style="max-width:200px"><label>Semester</label><select id="f-promes-semester" class="form-control" onchange="renderPromesEditor()"><option value="1">Semester I (Ganjil)</option><option value="2">Semester II (Genap)</option></select></div>
+                    <div class="grid-container" style="max-height:400px;overflow-y:auto"><table class="interactive-table" id="promes-table-editor"></table></div>
+                    <div class="btn-row"><div></div><button type="button" class="btn btn-primary" onclick="savePromesChanges()"><i class="fas fa-check-circle"></i> Terapkan</button></div>
+                </section>
+
+                <!-- DRAFTS -->
+                <section id="sec-drafts" class="view-section">
+                    <div class="panel-title"><h1>Draf Tersimpan</h1><p>Daftar perangkat ajar tersimpan di browser.</p></div>
+                    <div class="drafts-list" id="saved-drafts-container"></div>
+                </section>
+            </main>
+
+            <!-- PREVIEW PANEL -->
+            <section class="preview-panel">
+                <div class="preview-header">
+                    <div class="preview-title"><i class="fas fa-eye text-primary"></i> Pratinjau Dokumen</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <select id="preview-doc-type" class="form-control" style="width:140px;padding:6px 10px;font-size:11px;background:#1e293b" onchange="renderActivePreview()">
+                            <option value="modul">Modul Ajar</option>
+                            <option value="prota">PROTA</option>
+                            <option value="promes">PROMES</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" onclick="triggerBrowserPrint()" title="Cetak PDF"><i class="fas fa-print"></i></button>
+                        <button class="btn btn-accent btn-sm" onclick="exportToWord()" title="Export Word"><i class="fas fa-file-word"></i></button>
+                    </div>
+                </div>
+                <div class="preview-body">
+                    <div class="document-canvas" id="printable-area"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="kemenag_data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
