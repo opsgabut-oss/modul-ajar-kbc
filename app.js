@@ -326,9 +326,12 @@ function updateKKTP(idx, val) {
     kktpData.criteria[idx] = val;
 }
 
-function saveAndGoModul() {
+function saveAndGoKKTP() {
     const saved = JSON.parse(localStorage.getItem('kbc_prota_data'));
-    saved.kktp = kktpData;
+    saved.atp = atpData;
     localStorage.setItem('kbc_prota_data', JSON.stringify(saved));
-    alert('✅ KKTP berhasil disimpan! Fitur Modul Ajar akan segera hadir.');
+    
+    // Pindah ke halaman KKTP (BUKAN cuma alert!)
+    goToPage('kktp');
+}
 }
